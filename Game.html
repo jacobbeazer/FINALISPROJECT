@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE WORLDS BEST Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+        }
+
+        #game {
+            margin: 50px auto;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #4caf50;
+        }
+
+        #guess-input {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #game-feedback {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        #guess-count, #score {
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Section -->
+    <section id="game">
+        <h2>Enhanced Number Guessing Game</h2>
+        <p>Guess a number between 1 and 100!</p>
+        <div id="game-container">
+            <label for="difficulty">Select Difficulty:</label>
+            <select id="difficulty">
+                <option value="easy">Easy (1-50)</option>
+                <option value="medium" selected>Medium (1-100)</option>
+                <option value="hard">Hard (1-200)</option>
+            </select>
+            <br><br>
+            <input type="number" id="guess-input" placeholder="Enter your guess">
+            <button id="submit-guess">Submit Guess</button>
+            <button id="restart-game" class="hidden">Restart Game</button>
+            <p id="game-feedback"></p>
+            <p id="guess-count"></p>
+            <p id="score"></p>
+        </div>
+    </section>
+
+    <script>
+        // Variables
+        let randomNumber;
+        let maxRange = 100;
+        let attempts = 0;
+        let score = 0;
+
+        // Elements
+        const difficultySelect = document.getElementById("difficulty");
+        const guessInput = document.getElementById("guess-input");
+        const submitGuessButton = document.getElementById("submit-guess");
+        const restartGameButton = document.getElementById("restart-game");
+        const gameFeedback = document.getElementById("game-feedback");
+        const guessCount = document.getElementById("guess-count");
+        const scoreDisplay = document.getElementById("score");
+
+        // Functions
+        function generateRandomNumber(range) {
+            return Math.floor(Math.random() * range) + 1;
+        }
+
+        function startGame() {
+            const difficulty = difficultySelect.value;
+            maxRange = difficulty === "easy" ? 50 : difficulty === "medium" ? 100 : 200;
+            randomNumber = generateRandomNumber(maxRange);
+            attempts = 0;
+            score = 0;
+            guessInput.value = "";
+            guessInput.disabled = false;
+            submitGuessButton.disabled = false;
+            restartGameButton.classList.add("hidden");
+            gameFeedback.textContent = "";
+            guessCount.textContent = "";
+            scoreDisplay.textContent = "";
+        }
+
+        function checkGuess() {
+            const guess = parseInt(guessInput.value);
+            attempts++;
+            if (isNaN(guess) || guess < 1 || guess > maxRange) {
+                gameFeedback.textContent = `Please enter a valid number between 1 and ${maxRange}.`;
+                gameFeedback.className = "error";
+                return;
+            }
+
+            if (guess === randomNumber) {
+                gameFeedback.textContent = `Correct! You guessed the number in ${attempts} attempts.`;
+                gameFeedback.className = "success";
+                score = Math.max(100 - attempts * 10, 0);
+                scoreDisplay.textContent = `Your score: ${score}`;
+                guessInput.disabled = true;
+                submitGuessButton.disabled = true;
+                restartGameButton.classList.remove("hidden");
+            } else if (guess < randomNumber) {
+                gameFeedback.textContent = "Too low! Try again.";
+                gameFeedback.className = "error";
+            } else {
+                gameFeedback.textContent = "Too high! Try again.";
+                gameFeedback.className = "error";
+            }
+            guessCount.textContent = `Attempts: ${attempts}`;
+        }
+
+        // Event Listeners
+        difficultySelect.addEventListener("change", startGame);
+        submitGuessButton.addEventListener("click", checkGuess);
+        restartGameButton.addEventListener("click", startGame);
+
+        // Initialize Game
+        startGame();
+    </script>
+</body>
+</html>
