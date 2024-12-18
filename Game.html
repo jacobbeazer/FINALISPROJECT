@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE WORLDS BEST Number Guessing Game</title>
+    <title>Emoji Guessing Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Comic Sans MS', sans-serif;
             text-align: center;
-            background-color: #f0f8ff;
+            background: linear-gradient(to bottom, #FFDEE9, #B5FFFC);
             margin: 0;
             padding: 0;
         }
@@ -16,42 +16,53 @@
         #game {
             margin: 50px auto;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             padding: 20px;
-            border: 2px solid #4caf50;
-            border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border: 3px solid #FF69B4;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
         }
 
         h2 {
-            color: #4caf50;
+            color: #FF69B4;
+            font-size: 2em;
         }
 
         #guess-input {
             padding: 10px;
             width: 80%;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 2px solid #FF69B4;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1em;
         }
 
         button {
             padding: 10px 20px;
+            margin-top: 10px;
             border: none;
-            border-radius: 5px;
-            background-color: #4caf50;
+            border-radius: 20px;
+            background-color: #FF69B4;
             color: white;
+            font-size: 1.1em;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #FF1493;
         }
 
         #game-feedback {
-            margin: 10px 0;
+            margin: 15px 0;
             font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .emoji {
+            font-size: 2em;
+            margin: 5px;
         }
 
         .success {
@@ -62,7 +73,7 @@
             color: red;
         }
 
-        #guess-count, #score {
+        #guess-count, #score, #level-message {
             margin-top: 10px;
             font-size: 1.1em;
         }
@@ -70,27 +81,34 @@
         .hidden {
             display: none;
         }
+
+        .level {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <!-- Game Section -->
     <section id="game">
-        <h2>Enhanced Number Guessing Game</h2>
-        <p>Guess a number between 1 and 100!</p>
+        <h2>🎉 Emoji Guessing Game 🎮</h2>
+        <p>Guess the secret number and climb the levels! 🌟</p>
         <div id="game-container">
             <label for="difficulty">Select Difficulty:</label>
             <select id="difficulty">
-                <option value="easy">Easy (1-50)</option>
-                <option value="medium" selected>Medium (1-100)</option>
-                <option value="hard">Hard (1-200)</option>
+                <option value="easy">Easy 🐣 (1-50)</option>
+                <option value="medium" selected>Medium 🚀 (1-100)</option>
+                <option value="hard">Hard 🔥 (1-200)</option>
+                <option value="insane">Insane 🤯 (1-500)</option>
             </select>
             <br><br>
             <input type="number" id="guess-input" placeholder="Enter your guess">
-            <button id="submit-guess">Submit Guess</button>
-            <button id="restart-game" class="hidden">Restart Game</button>
+            <button id="submit-guess">Submit Guess 🤔</button>
+            <button id="restart-game" class="hidden">Restart Game 🔄</button>
             <p id="game-feedback"></p>
             <p id="guess-count"></p>
             <p id="score"></p>
+            <p id="level-message" class="hidden"></p>
         </div>
     </section>
 
@@ -100,6 +118,7 @@
         let maxRange = 100;
         let attempts = 0;
         let score = 0;
+        let currentLevel = 1;
 
         // Elements
         const difficultySelect = document.getElementById("difficulty");
@@ -109,6 +128,7 @@
         const gameFeedback = document.getElementById("game-feedback");
         const guessCount = document.getElementById("guess-count");
         const scoreDisplay = document.getElementById("score");
+        const levelMessage = document.getElementById("level-message");
 
         // Functions
         function generateRandomNumber(range) {
@@ -117,9 +137,12 @@
 
         function startGame() {
             const difficulty = difficultySelect.value;
-            maxRange = difficulty === "easy" ? 50 : difficulty === "medium" ? 100 : 200;
+            maxRange = difficulty === "easy" ? 50 :
+                       difficulty === "medium" ? 100 :
+                       difficulty === "hard" ? 200 : 500;
             randomNumber = generateRandomNumber(maxRange);
             attempts = 0;
+            currentLevel = 1;
             score = 0;
             guessInput.value = "";
             guessInput.disabled = false;
@@ -128,33 +151,61 @@
             gameFeedback.textContent = "";
             guessCount.textContent = "";
             scoreDisplay.textContent = "";
+            levelMessage.textContent = "";
+            levelMessage.classList.add("hidden");
+        }
+
+        function updateLevelMessage() {
+            const messages = [
+                "🐣 You're just starting out! Keep going!",
+                "🚀 You're getting better! Level up!",
+                "🔥 Amazing skills! You're on fire!",
+                "🤯 Genius! Master level reached!"
+            ];
+            levelMessage.textContent = messages[currentLevel - 1] || "🌟 You're unstoppable!";
+            levelMessage.classList.remove("hidden");
         }
 
         function checkGuess() {
             const guess = parseInt(guessInput.value);
             attempts++;
             if (isNaN(guess) || guess < 1 || guess > maxRange) {
-                gameFeedback.textContent = `Please enter a valid number between 1 and ${maxRange}.`;
-                gameFeedback.className = "error";
+                gameFeedback.textContent = `⚠️ Please enter a valid number between 1 and ${maxRange}.`;
+                gameFeedback.className = "error emoji";
                 return;
             }
 
             if (guess === randomNumber) {
-                gameFeedback.textContent = `Correct! You guessed the number in ${attempts} attempts.`;
-                gameFeedback.className = "success";
-                score = Math.max(100 - attempts * 10, 0);
-                scoreDisplay.textContent = `Your score: ${score}`;
+                gameFeedback.textContent = `🎉 Correct! You guessed the number in ${attempts} attempts.`;
+                gameFeedback.className = "success emoji";
+                score += Math.max(100 - attempts * 10, 0);
+                scoreDisplay.textContent = `⭐ Score: ${score}`;
                 guessInput.disabled = true;
                 submitGuessButton.disabled = true;
                 restartGameButton.classList.remove("hidden");
+
+                // Level Up
+                if (currentLevel < 4) {
+                    currentLevel++;
+                    updateLevelMessage();
+                    setTimeout(() => {
+                        maxRange *= 2;
+                        randomNumber = generateRandomNumber(maxRange);
+                        attempts = 0;
+                        gameFeedback.textContent = `🎯 New Level Unlocked! Guess a number between 1 and ${maxRange}!`;
+                        guessInput.disabled = false;
+                        submitGuessButton.disabled = false;
+                        guessInput.value = "";
+                    }, 2000);
+                }
             } else if (guess < randomNumber) {
-                gameFeedback.textContent = "Too low! Try again.";
-                gameFeedback.className = "error";
+                gameFeedback.textContent = "⬇️ Too low! Try again.";
+                gameFeedback.className = "error emoji";
             } else {
-                gameFeedback.textContent = "Too high! Try again.";
-                gameFeedback.className = "error";
+                gameFeedback.textContent = "⬆️ Too high! Try again.";
+                gameFeedback.className = "error emoji";
             }
-            guessCount.textContent = `Attempts: ${attempts}`;
+            guessCount.textContent = `🎯 Attempts: ${attempts}`;
         }
 
         // Event Listeners
